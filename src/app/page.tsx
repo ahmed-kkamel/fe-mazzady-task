@@ -14,7 +14,7 @@ const HomePage: FC = () => {
           <h2 className="text-base md:text-2xl font-bold" aria-label="Static Page Design">Static Page Design</h2>
           <p className="text-sm md:text-base" aria-label="Static Page Description">Create a visually stunning static page design that captivates users.</p>
           <Link
-            href="/static-designs"
+            href="/static-design"
             className="text-sm md:text-base bg-[#D20653] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#FF951D] transition-all font-medium md:font-semibold"
             aria-label="Link to Static Page Task"
           >
