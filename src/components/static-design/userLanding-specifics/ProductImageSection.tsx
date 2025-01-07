@@ -4,8 +4,8 @@ import Image from "next/image";
 type ProductImageSectionProps = {
     product: Pick<ProductItem, "image" | "title" | "badge" | "liked">;
 };
-
 export default function ProductImageSection({ product }: ProductImageSectionProps) {
+
     return (
         <div className="lg:w-28 lg:h-28 w-32 h-24 relative">
             <div className="absolute top-1 left-1 z-50 lg:hidden flex items-center justify-center bg-white rounded-full">
