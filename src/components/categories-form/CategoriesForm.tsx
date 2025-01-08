@@ -40,12 +40,14 @@ interface CategoriesFormProps {
 export default function CategoriesForm({ categories }: CategoriesFormProps) {
     const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
     const [properties, setProperties] = useState<Property[]>([]);
+    const [otherInputs, setOtherInputs] = useState<Record<number, string>>({});
 
     const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const categoryId = parseInt(e.target.value);
         const category = categories.find((cat) => cat.id === categoryId);
         setSubcategories(category?.children || []);
         setProperties([]);
+        setOtherInputs({});
     };
 
     const handleSubcategoryChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -68,6 +70,25 @@ export default function CategoriesForm({ categories }: CategoriesFormProps) {
         } catch (error) {
             console.error("Failed to fetch properties:", error);
         }
+    };
+
+    const handleOptionChange = (propertyId: number, value: string) => {
+        setOtherInputs((prev) => {
+            const updated = { ...prev };
+            if (value === "other") {
+                updated[propertyId] = "";
+            } else {
+                delete updated[propertyId];
+            }
+            return updated;
+        });
+    };
+
+    const handleOtherInputChange = (propertyId: number, value: string) => {
+        setOtherInputs((prev) => ({
+            ...prev,
+            [propertyId]: value,
+        }));
     };
 
     console.log(properties, "properties");
@@ -110,6 +131,7 @@ export default function CategoriesForm({ categories }: CategoriesFormProps) {
                     <div key={property.id}>
                         <label className="block text-sm font-medium text-gray-700">{property.name}</label>
                         <select
+                            onChange={(e) => handleOptionChange(property.id, e.target.value)}
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         >
                             <option value="">Select an option</option>
@@ -118,7 +140,18 @@ export default function CategoriesForm({ categories }: CategoriesFormProps) {
                                     {option.name}
                                 </option>
                             ))}
+                            <option value="other">Other</option>
                         </select>
+
+                        {otherInputs[property.id] !== undefined && (
+                            <input
+                                type="text"
+                                value={otherInputs[property.id]}
+                                onChange={(e) => handleOtherInputChange(property.id, e.target.value)}
+                                placeholder="Specify other"
+                                className="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            />
+                        )}
                     </div>
                 ))}
             </form>
