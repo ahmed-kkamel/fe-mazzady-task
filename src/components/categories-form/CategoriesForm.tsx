@@ -41,6 +41,8 @@ export default function CategoriesForm({ categories }: CategoriesFormProps) {
     const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
     const [properties, setProperties] = useState<Property[]>([]);
     const [otherInputs, setOtherInputs] = useState<Record<number, string>>({});
+    const [childOptions, setChildOptions] = useState<Record<number, Option[]>>({});
+    const [selectedChildOptions, setSelectedChildOptions] = useState<Record<number, number | null>>({});
 
     const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const categoryId = parseInt(e.target.value);
@@ -48,6 +50,8 @@ export default function CategoriesForm({ categories }: CategoriesFormProps) {
         setSubcategories(category?.children || []);
         setProperties([]);
         setOtherInputs({});
+        setChildOptions({});
+        setSelectedChildOptions({});
     };
 
     const handleSubcategoryChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -64,24 +68,59 @@ export default function CategoriesForm({ categories }: CategoriesFormProps) {
                 }
             });
             const data = await response.json();
-            console.log(data, "data");
-
             setProperties(data.data || []);
         } catch (error) {
             console.error("Failed to fetch properties:", error);
         }
     };
 
-    const handleOptionChange = (propertyId: number, value: string) => {
+    const handleOptionChange = async (propertyId: number, value: string) => {
         setOtherInputs((prev) => {
             const updated = { ...prev };
             if (value === "other") {
-                updated[propertyId] = "";
-            } else {
-                delete updated[propertyId];
+                updated[propertyId] = ""; // Initialize the input field when "other" is selected
+            } else if (updated[propertyId] !== undefined) {
+                delete updated[propertyId]; // Clear the input field only when an option is selected
             }
             return updated;
         });
+
+        // If the option has children, fetch them
+        if (value !== "other") {
+            try {
+                const response = await fetch(
+                    `https://staging.mazaady.com/api/v1/get-options-child/${value}`, {
+                    headers: {
+                        "private-key": "3%o8i}_;3D4bF]G5@22r2)Et1&mLJ4?$@+16"
+                    }
+                });
+                const data = await response.json();
+                if (data.code === 200) {
+                    setChildOptions((prev) => ({
+                        ...prev,
+                        [propertyId]: data.data[0]?.options || [],
+                    }));
+                } else {
+                    setChildOptions((prev) => ({
+                        ...prev,
+                        [propertyId]: [],
+                    }));
+                }
+            } catch (error) {
+                console.error("Failed to fetch child options:", error);
+                setChildOptions((prev) => ({
+                    ...prev,
+                    [propertyId]: [],
+                }));
+            }
+        }
+    };
+
+    const handleChildOptionChange = (propertyId: number, childId: number | null) => {
+        setSelectedChildOptions((prev) => ({
+            ...prev,
+            [propertyId]: childId,
+        }));
     };
 
     const handleOtherInputChange = (propertyId: number, value: string) => {
@@ -90,8 +129,6 @@ export default function CategoriesForm({ categories }: CategoriesFormProps) {
             [propertyId]: value,
         }));
     };
-
-    console.log(properties, "properties");
 
     return (
         <div className="p-4 max-w-md mx-auto bg-white shadow-md rounded">
@@ -143,6 +180,25 @@ export default function CategoriesForm({ categories }: CategoriesFormProps) {
                             <option value="other">Other</option>
                         </select>
 
+                        {childOptions[property.id] && childOptions[property.id].length > 0 && (
+                            <div className="mt-2">
+                                <label className="block text-sm font-medium text-gray-700">Child Options</label>
+                                <select
+                                    onChange={(e) => handleChildOptionChange(property.id, parseInt(e.target.value))}
+                                    value={selectedChildOptions[property.id] ?? ""}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                >
+                                    <option value="">Select a child option</option>
+                                    {childOptions[property.id].map((child) => (
+                                        <option key={child.id} value={child.id}>
+                                            {child.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+
+                        {/* Only show 'Other' input if it's selected */}
                         {otherInputs[property.id] !== undefined && (
                             <input
                                 type="text"
