@@ -1,50 +1,14 @@
 "use client";
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import Select from "react-select";
+import { fetchProperties, fetchChildOptions } from "@/utils/api/api"
+import { Option, Property, CategoriesFormProps } from "@/types/CategoriesFormTypes"
 
-
-interface Option {
-    id: number;
-    name: string;
-    slug: string;
-    parent: number;
-    child: boolean;
-}
-
-interface Property {
-    id: number;
-    name: string;
-    description: string | null;
-    slug: string;
-    parent: number | null;
-    list: boolean;
-    type: string | null;
-    value: string;
-    other_value: string | null;
-    options: Option[];
-    selectedOption?: Option | null;
-}
-
-
-interface Subcategory {
-    id: number;
-    name: string;
-}
-
-interface Category {
-    id: number;
-    name: string;
-    children: Subcategory[];
-}
-
-interface CategoriesFormProps {
-    categories: Category[];
-}
 
 export default function CategoriesForm({ categories }: CategoriesFormProps) {
     const [formData, setFormData] = useState<{
-        category?: string;
-        subcategory?: string;
+        categoryId?: number;
+        subcategoryId?: number;
         properties: Property[];
         otherInputs: Record<number, string>;
         childOptions: Record<number, Option[]>;
@@ -53,94 +17,77 @@ export default function CategoriesForm({ categories }: CategoriesFormProps) {
         properties: [],
         otherInputs: {},
         childOptions: {},
-        selectedChildOptions: {}
+        selectedChildOptions: {},
     });
     const [submittedData, setSubmittedData] = useState<typeof formData | null>(null);
 
-    const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const categoryId = parseInt(e.target.value);
-        const category = categories.find((cat) => cat.id === categoryId);
-        setFormData({
-            ...formData,
-            category: category?.name || "",
-            subcategory: undefined,
-            properties: [],
-            otherInputs: {},
-            childOptions: {},
-            selectedChildOptions: {}
-        });
-    };
-
-    const handleSubcategoryChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const subcategoryId = parseInt(e.target.value);
-        const subcategory = formData.category
-            ? categories
-                .find((cat) => cat.name === formData.category)
-                ?.children.find((sub) => sub.id === subcategoryId)
-            : null;
-
-        if (!subcategoryId) {
-            setFormData((prev) => ({
-                ...prev,
-                subcategory: undefined,
-                properties: []
-            }));
-            return;
-        }
-
-        try {
-            const response = await fetch(`https://staging.mazaady.com/api/v1/properties?cat=${subcategoryId}`, {
-                headers: {
-                    "private-key": "3%o8i}_;3D4bF]G5@22r2)Et1&mLJ4?$@+16"
-                }
+    const handleCategoryChange = useCallback(
+        (e: React.ChangeEvent<HTMLSelectElement>) => {
+            const categoryId = parseInt(e.target.value);
+            setFormData({
+                categoryId,
+                subcategoryId: undefined,
+                properties: [],
+                otherInputs: {},
+                childOptions: {},
+                selectedChildOptions: {},
             });
-            const data = await response.json();
+        },
+        []
+    );
+
+    const handleSubcategoryChange = useCallback(
+        async (e: React.ChangeEvent<HTMLSelectElement>) => {
+            const subcategoryId = parseInt(e.target.value);
             setFormData((prev) => ({
                 ...prev,
-                subcategory: subcategory?.name || "",
-                properties: data.data || []
+                subcategoryId,
+                properties: [],
             }));
-        } catch (error) {
-            console.error("Failed to fetch properties:", error);
-        }
-    };
 
-    const handleOptionChange = async (propertyId: number, value: string) => {
-        const selectedOption = formData.properties
-            .find((property) => property.id === propertyId)
-            ?.options.find((option) => option.id === parseInt(value));
+            if (!subcategoryId) return;
 
-        setFormData((prev) => {
-            const updatedOtherInputs = { ...prev.otherInputs };
-            if (value === "other") {
-                updatedOtherInputs[propertyId] = "";
-            } else if (updatedOtherInputs[propertyId] !== undefined) {
-                delete updatedOtherInputs[propertyId];
-            }
-
-            return {
-                ...prev,
-                properties: prev.properties.map((property) =>
-                    property.id === propertyId
-                        ? { ...property, selectedOption: selectedOption || null }
-                        : property
-                ),
-                otherInputs: updatedOtherInputs,
-            };
-        });
-
-        if (value !== "other") {
             try {
-                const response = await fetch(
-                    `https://staging.mazaady.com/api/v1/get-options-child/${value}`,
-                    {
-                        headers: {
-                            "private-key": "3%o8i}_;3D4bF]G5@22r2)Et1&mLJ4?$@+16",
-                        },
-                    }
-                );
-                const data = await response.json();
-                if (data.code === 200) {
+                const data = await fetchProperties(subcategoryId);
+                setFormData((prev) => ({
+                    ...prev,
+                    properties: data.data || [],
+                }));
+            } catch (error) {
+                console.error("Failed to fetch properties:", error);
+            }
+        },
+        []
+    );
+
+    const handleOptionChange = useCallback(
+        async (propertyId: number, value: string) => {
+            const selectedOption = formData.properties
+                .find((property) => property.id === propertyId)
+                ?.options.find((option) => option.id === parseInt(value));
+
+            setFormData((prev) => {
+                const updatedOtherInputs = { ...prev.otherInputs };
+                if (value === "other") {
+                    updatedOtherInputs[propertyId] = "";
+                } else {
+                    delete updatedOtherInputs[propertyId];
+                }
+
+                return {
+                    ...prev,
+                    properties: prev.properties.map((property) =>
+                        property.id === propertyId
+                            ? { ...property, selectedOption: selectedOption || null }
+                            : property
+                    ),
+                    otherInputs: updatedOtherInputs,
+                };
+            });
+
+            if (value !== "other") {
+                try {
+                    const data = await fetchChildOptions(value);
                     setFormData((prev) => ({
                         ...prev,
                         childOptions: {
@@ -148,79 +95,71 @@ export default function CategoriesForm({ categories }: CategoriesFormProps) {
                             [propertyId]: data.data[0]?.options || [],
                         },
                     }));
-                } else {
-                    setFormData((prev) => ({
-                        ...prev,
-                        childOptions: {
-                            ...prev.childOptions,
-                            [propertyId]: [],
-                        },
-                    }));
+                } catch (error) {
+                    console.error("Failed to fetch child options:", error);
                 }
-            } catch (error) {
-                console.error("Failed to fetch child options:", error);
-                setFormData((prev) => ({
-                    ...prev,
-                    childOptions: {
-                        ...prev.childOptions,
-                        [propertyId]: [],
-                    },
-                }));
             }
-        }
-    };
+        },
+        [formData.properties]
+    );
 
+    const handleSubmit = useCallback(
+        (e: React.FormEvent) => {
+            e.preventDefault();
+            setSubmittedData(formData);
+        },
+        [formData]
+    );
 
-    const handleChildOptionChange = (propertyId: number, childId: string) => {
-        setFormData((prev) => ({
-            ...prev,
-            selectedChildOptions: {
-                ...prev.selectedChildOptions,
-                [propertyId]: childId,
-            }
-        }));
-    };
+    const categoryOptions = useMemo(
+        () =>
+            categories.map((cat) => ({
+                value: cat.id.toString(),
+                label: cat.name,
+            })),
+        [categories]
+    );
 
-    const handleOtherInputChange = (propertyId: number, value: string) => {
-        setFormData((prev) => ({
-            ...prev,
-            otherInputs: {
-                ...prev.otherInputs,
-                [propertyId]: value
-            }
-        }));
-    };
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        setSubmittedData(formData);
-    };
+    const subcategoryOptions = useMemo(() => {
+        const category = categories.find((cat) => cat.id === formData.categoryId);
+        return category
+            ? category.children.map((sub) => ({
+                value: sub.id.toString(),
+                label: sub.name,
+            }))
+            : [];
+    }, [categories, formData.categoryId]);
 
     return (
         <div className="p-6 max-w-xl mx-auto bg-gradient-to-r from-indigo-50 via-white to-indigo-100 shadow-lg rounded-lg">
-            <h2 className="text-2xl font-bold text-gray-800 text-center mb-4">
-                Categories Form
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-800 text-center mb-4">Categories Form</h2>
             {submittedData ? (
                 <div className="mt-8 p-4 bg-white rounded-lg shadow-lg">
                     <h3 className="text-xl font-bold mb-4">Submitted Data</h3>
-                    <table className="table-auto w-full">
+                    <table className="table-auto w-full border-collapse border border-gray-300">
                         <thead>
                             <tr>
-                                <th className="text-left px-4 py-2 border">Field</th>
-                                <th className="text-left px-4 py-2 border">Value</th>
+                                <th className="px-4 py-2 border">Field</th>
+                                <th className="px-4 py-2 border">Value</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {submittedData.category && (
+                            {submittedData.categoryId && (
                                 <tr>
                                     <td className="px-4 py-2 border">Category</td>
-                                    <td className="px-4 py-2 border">{submittedData.category}</td>
+                                    <td className="px-4 py-2 border">
+                                        {categories.find((cat) => cat.id === submittedData.categoryId)?.name || "Unknown"}
+                                    </td>
                                 </tr>
                             )}
-                            {submittedData.subcategory && (
+                            {submittedData.subcategoryId && (
                                 <tr>
                                     <td className="px-4 py-2 border">Subcategory</td>
-                                    <td className="px-4 py-2 border">{submittedData.subcategory}</td>
+                                    <td className="px-4 py-2 border">
+                                        {categories
+                                            .find((cat) => cat.id === submittedData.categoryId)
+                                            ?.children.find((sub) => sub.id === submittedData.subcategoryId)?.name || "Unknown"}
+                                    </td>
                                 </tr>
                             )}
                             {submittedData.properties.map((property) => {
@@ -240,59 +179,59 @@ export default function CategoriesForm({ categories }: CategoriesFormProps) {
                                     </tr>
                                 );
                             })}
+                            {Object.entries(submittedData.selectedChildOptions).map(([propertyId, childOptionId]) => {
+                                const childOption = submittedData.childOptions[parseInt(propertyId)]?.find(
+                                    (option) => option.id.toString() === childOptionId
+                                );
+                                return (
+                                    <tr key={propertyId}>
+                                        <td className="px-4 py-2 border">Child Option</td>
+                                        <td className="px-4 py-2 border">
+                                            {childOption ? childOption.name : "No child option selected"}
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
-
                 </div>
             ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                            Categories
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700">Categories</label>
                         <select
                             onChange={handleCategoryChange}
+                            value={formData.categoryId || ""}
                             className="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm focus:ring focus:ring-indigo-500"
                         >
                             <option value="">Select a category</option>
-                            {categories.map((category) => (
-                                <option key={category.id} value={category.id}>
-                                    {category.name}
+                            {categoryOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
                                 </option>
                             ))}
                         </select>
                     </div>
-                    {formData.category && (
+                    {formData.categoryId && (
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                                Subcategories
-                            </label>
+                            <label className="block text-sm font-medium text-gray-700">Subcategories</label>
                             <select
                                 onChange={handleSubcategoryChange}
-                                disabled={!formData.category}
+                                value={formData.subcategoryId || ""}
                                 className="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm focus:ring focus:ring-indigo-500"
                             >
-                                <option value="">
-                                    {formData.category
-                                        ? "Select a subcategory"
-                                        : "No subcategories available"}
-                                </option>
-                                {categories
-                                    .find((cat) => cat.name === formData.category)
-                                    ?.children.map((sub) => (
-                                        <option key={sub.id} value={sub.id}>
-                                            {sub.name}
-                                        </option>
-                                    ))}
+                                <option value="">Select a subcategory</option>
+                                {subcategoryOptions.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                     )}
-
                     {formData.properties.map((property) => (
                         <div key={property.id}>
-                            <label className="block text-sm font-medium text-gray-700">
-                                {property.name}
-                            </label>
+                            <label className="block text-sm font-medium text-gray-700">{property.name}</label>
                             <Select
                                 options={[
                                     ...property.options.map((option) => ({
@@ -307,56 +246,25 @@ export default function CategoriesForm({ categories }: CategoriesFormProps) {
                                 placeholder="Select an option"
                                 className="mt-1"
                             />
-
                             {formData.otherInputs[property.id] !== undefined && (
                                 <input
                                     type="text"
                                     value={formData.otherInputs[property.id]}
                                     onChange={(e) =>
-                                        handleOtherInputChange(property.id, e.target.value)
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            otherInputs: {
+                                                ...prev.otherInputs,
+                                                [property.id]: e.target.value,
+                                            },
+                                        }))
                                     }
                                     placeholder="Specify other"
                                     className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:ring focus:ring-indigo-500"
                                 />
                             )}
-
-                            {formData.childOptions[property.id] &&
-                                formData.childOptions[property.id].length > 0 && (
-                                    <div className="mt-2">
-                                        <label className="block text-sm font-medium text-gray-700">
-                                            Child Options
-                                        </label>
-                                        <Select
-                                            options={formData.childOptions[property.id].map((child) => ({
-                                                value: child.id.toString(),
-                                                label: child.name,
-                                            }))}
-                                            onChange={(selectedChild) =>
-                                                handleChildOptionChange(
-                                                    property.id,
-                                                    selectedChild?.value || ""
-                                                )
-                                            }
-                                            placeholder="Select a child option"
-                                            value={
-                                                formData.selectedChildOptions[property.id]
-                                                    ? {
-                                                        value: formData.selectedChildOptions[property.id],
-                                                        label: formData.childOptions[property.id].find(
-                                                            (child) =>
-                                                                child.id.toString() ===
-                                                                formData.selectedChildOptions[property.id]
-                                                        )?.name,
-                                                    }
-                                                    : null
-                                            }
-                                            className="mt-1"
-                                        />
-                                    </div>
-                                )}
                         </div>
                     ))}
-
                     <button
                         type="submit"
                         className="w-full py-2 px-4 bg-indigo-600 text-white font-bold rounded-lg shadow-md hover:bg-indigo-700 focus:ring focus:ring-indigo-500"
@@ -367,5 +275,4 @@ export default function CategoriesForm({ categories }: CategoriesFormProps) {
             )}
         </div>
     );
-
 }
