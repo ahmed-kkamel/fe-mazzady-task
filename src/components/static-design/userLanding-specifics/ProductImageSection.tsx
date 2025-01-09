@@ -4,7 +4,9 @@ import Image from "next/image";
 type ProductImageSectionProps = {
     product: Pick<ProductItem, "image" | "title" | "badge" | "liked">;
 };
+
 export default function ProductImageSection({ product }: ProductImageSectionProps) {
+    const badgeColor = product.badge.type === "Live Auction" ? "bg-pink-500" : "bg-orange-500";
 
     return (
         <div className="lg:w-28 lg:h-28 w-32 h-24 relative">
@@ -37,7 +39,7 @@ export default function ProductImageSection({ product }: ProductImageSectionProp
                 layout="fill"
             />
             <div
-                className={`text-white text-[8px] lg:text-xs px-2 py-1 rounded-br-2xl rounded-tl-2xl lg:rounded-br-3xl lg:rounded-tl-3xl ${product.badge.color} absolute bottom-0 right-0`}
+                className={`text-white text-[8px] lg:text-xs px-2 py-1 rounded-br-2xl rounded-tl-2xl lg:rounded-br-3xl lg:rounded-tl-3xl ${badgeColor} absolute bottom-0 right-0`}
             >
                 {product.badge.type}
             </div>

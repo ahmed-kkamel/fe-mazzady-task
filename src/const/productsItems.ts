@@ -37,4 +37,13 @@ export const productsItems: ProductItem[] = [
     badge: { type: "Live Auction", color: "bg-pink-500" },
     liked: false,
   },
+  {
+    id: 5,
+    image: "/images/product-3.png",
+    title: "Jeep Car, New, Used For Only One Time",
+    price: "1000 EGP",
+    timeLeft: { days: 2, hours: 10, minutes: 50 },
+    badge: { type: "Hot Sale", color: "bg-orange-500" },
+    liked: true,
+  },
 ];

@@ -1,5 +1,7 @@
 
-const SubcategorySelect = ({ formData, subcategoryOptions, handleSubcategoryChange }: { formData: any, subcategoryOptions: any, handleSubcategoryChange: any }) => {
+const SubcategorySelect = ({ formData, subcategoryOptions, handleSubcategoryChange }:
+    { formData: any, subcategoryOptions: any, handleSubcategoryChange: any }
+) => {
 
     return (
         <div>
@@ -7,7 +9,7 @@ const SubcategorySelect = ({ formData, subcategoryOptions, handleSubcategoryChan
             <select
                 onChange={handleSubcategoryChange}
                 value={formData.subcategoryId || ""}
-                className="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm focus:ring focus:ring-indigo-500"
+                className="mt-1 block w-full rounded border border-gray-300 shadow-sm p-2 focus:border-blue-800 focus:outline-none"
             >
                 <option value="">Select a subcategory</option>
                 {subcategoryOptions.map((option: any) => (

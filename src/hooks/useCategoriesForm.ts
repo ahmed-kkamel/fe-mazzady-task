@@ -12,6 +12,7 @@ export const useCategoriesForm = (categories: any[]) => {
   const [submittedData, setSubmittedData] = useState<typeof formData | null>(
     null
   );
+  const [loading, setLoading] = useState(false);
 
   const handleCategoryChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -40,6 +41,7 @@ export const useCategoriesForm = (categories: any[]) => {
 
       if (!subcategoryId) return;
 
+      setLoading(true);
       try {
         const data = await fetchProperties(subcategoryId);
         setFormData((prev) => ({
@@ -48,6 +50,8 @@ export const useCategoriesForm = (categories: any[]) => {
         }));
       } catch (error) {
         console.error("Failed to fetch properties:", error);
+      } finally {
+        setLoading(false);
       }
     },
     []
@@ -120,12 +124,24 @@ export const useCategoriesForm = (categories: any[]) => {
       : [];
   }, [categories, formData.categoryId]);
 
+  const isSubmitDisabled = useMemo(() => {
+    const { categoryId, subcategoryId, properties, otherInputs } = formData;
+    return (
+      !categoryId &&
+      !subcategoryId &&
+      properties.length === 0 &&
+      Object.keys(otherInputs).length === 0
+    );
+  }, [formData]);
+
   return {
     formData,
-    setFormData,
     submittedData,
     categoryOptions,
     subcategoryOptions,
+    isSubmitDisabled,
+    loading,
+    setFormData,
     handleCategoryChange,
     handleSubcategoryChange,
     handleOptionChange,

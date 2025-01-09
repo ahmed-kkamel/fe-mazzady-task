@@ -6,7 +6,7 @@ import { productsItems } from "@/const/productsItems";
 
 export default function UserLanding() {
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 lg:py-12 p-4 bg-black">
+        <div className="grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 lg:py-12 p-4 bg-gray-100 container mx-auto">
             <aside className="flex flex-col gap-6">
                 <ProfileCard />
                 <QRCodeSection />

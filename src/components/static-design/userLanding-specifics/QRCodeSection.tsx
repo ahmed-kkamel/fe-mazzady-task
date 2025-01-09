@@ -12,8 +12,8 @@ export default function QRCodeSection() {
 
     return (
         <div className={`flex flex-col gap-2 lg:gap-4 bg-white rounded-3xl p-4 lg:p-6 ${isCollapsed ? "overflow-hidden" : ""}`}>
-            <div className="flex justify-between">
-                <h3 className="text-lg lg:text-2xl font-semibold mb-2">QR Code</h3>
+            <div className="flex justify-between items-center">
+                <h3 className="text-lg lg:text-2xl font-semibold">QR Code</h3>
                 <div className="flex gap-2 items-center">
                     {["eye", "send-square", "document-download"].map((icon) => (
                         <Image

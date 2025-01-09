@@ -5,10 +5,11 @@ import { HeaderActions } from "./header-specifics/HeaderActions";
 
 export const Header: FC = () => {
     return (
-        <header className="flex justify-between items-center px-4 lg:px-6 py-4 bg-white ">
-            <LogoAndNavigation />
-            <HeaderActions />
+        <header className="flex justify-between items-center px-4 lg:px-6 py-4 bg-white">
+            <div className="container mx-auto flex justify-between">
+                <LogoAndNavigation />
+                <HeaderActions />
+            </div>
         </header>
     );
 };
-

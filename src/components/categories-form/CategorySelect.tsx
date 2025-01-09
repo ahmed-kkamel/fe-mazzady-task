@@ -1,4 +1,3 @@
-import React from "react";
 
 const CategorySelect = ({ categoryOptions, handleCategoryChange, formData }:
     { categoryOptions: any[], handleCategoryChange: any, formData: any }) => {
@@ -9,7 +8,7 @@ const CategorySelect = ({ categoryOptions, handleCategoryChange, formData }:
             <select
                 onChange={handleCategoryChange}
                 value={formData.categoryId || ""}
-                className="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm focus:ring focus:ring-indigo-500"
+                className="mt-1 block w-full rounded border border-gray-300 shadow-sm p-2 focus:border-blue-800 focus:outline-none"
             >
                 <option value="">Select a category</option>
                 {categoryOptions.map((option: any) => (

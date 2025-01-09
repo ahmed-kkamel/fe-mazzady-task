@@ -1,4 +1,3 @@
-// components/SubmittedData.tsx
 
 const SubmittedData = ({ submittedData, categories }: { submittedData: any; categories: any[] }) => (
     <div className="mt-8 p-4 bg-white rounded-lg shadow-lg">

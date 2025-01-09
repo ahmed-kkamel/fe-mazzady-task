@@ -30,7 +30,7 @@ const PropertySelect = ({
                         onChange={(selectedOption) =>
                             handleOptionChange(property.id, selectedOption?.value || "")
                         }
-                        placeholder="Select an option"
+                        placeholder="Select an option or search"
                         className="mt-1"
                     />
                     {formData.otherInputs[property.id] !== undefined && (
@@ -47,7 +47,7 @@ const PropertySelect = ({
                                 }))
                             }
                             placeholder="Specify other"
-                            className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:ring focus:ring-indigo-500"
+                            className="mt-2 block w-full rounded border-gray-300 shadow-sm p-2 focus:border-blue-800 focus:outline-none"
                         />
                     )}
                     {formData.childOptions[property.id] &&
