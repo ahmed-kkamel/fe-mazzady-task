@@ -1,5 +1,7 @@
 "use client";
 import { useState } from "react";
+import Select from "react-select";
+
 
 interface Option {
     id: number;
@@ -195,96 +197,10 @@ export default function CategoriesForm({ categories }: CategoriesFormProps) {
 
     return (
         <div className="p-6 max-w-xl mx-auto bg-gradient-to-r from-indigo-50 via-white to-indigo-100 shadow-lg rounded-lg">
-            <h2 className="text-2xl font-bold text-gray-800 text-center mb-4">Categories Form</h2>
-            <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Categories</label>
-                    <select
-                        onChange={handleCategoryChange}
-                        className="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm focus:ring focus:ring-indigo-500"
-                    >
-                        <option value="">Select a category</option>
-                        {categories.map((category) => (
-                            <option key={category.id} value={category.id}>
-                                {category.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                {formData.category && (
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Subcategories</label>
-                        <select
-                            onChange={handleSubcategoryChange}
-                            disabled={!formData.category}
-                            className="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm focus:ring focus:ring-indigo-500"
-                        >
-                            <option value="">{formData.category ? 'Select a subcategory' : 'No subcategories available'}</option>
-                            {categories.find((cat) => cat.name === formData.category)?.children.map((sub) => (
-                                <option key={sub.id} value={sub.id}>
-                                    {sub.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                )}
-
-                {formData.properties.map((property) => (
-                    <div key={property.id}>
-                        <label className="block text-sm font-medium text-gray-700">{property.name}</label>
-                        <select
-                            onChange={(e) => handleOptionChange(property.id, e.target.value)}
-                            className="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm focus:ring focus:ring-indigo-500"
-                        >
-                            <option value="">Select an option</option>
-                            {property.options.map((option) => (
-                                <option key={option.id} value={option.id}>
-                                    {option.name}
-                                </option>
-                            ))}
-                            <option value="other">Other</option>
-                        </select>
-
-                        {formData.childOptions[property.id] && formData.childOptions[property.id].length > 0 && (
-                            <div className="mt-2">
-                                <label className="block text-sm font-medium text-gray-700">Child Options</label>
-                                <select
-                                    onChange={(e) => handleChildOptionChange(property.id, e.target.value)}
-                                    value={formData.selectedChildOptions[property.id] ?? ""}
-                                    className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring focus:ring-indigo-500"
-                                >
-                                    <option value="">Select a child option</option>
-                                    {formData.childOptions[property.id].map((child) => (
-                                        <option key={child.id} value={child.id}>
-                                            {child.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        )}
-
-                        {formData.otherInputs[property.id] !== undefined && (
-                            <input
-                                type="text"
-                                value={formData.otherInputs[property.id]}
-                                onChange={(e) => handleOtherInputChange(property.id, e.target.value)}
-                                placeholder="Specify other"
-                                className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:ring focus:ring-indigo-500"
-                            />
-                        )}
-                    </div>
-                ))}
-
-                <button
-                    type="submit"
-                    className="w-full py-2 px-4 bg-indigo-600 text-white font-bold rounded-lg shadow-md hover:bg-indigo-700 focus:ring focus:ring-indigo-500"
-                >
-                    Submit
-                </button>
-            </form>
-
-            {submittedData && (
+            <h2 className="text-2xl font-bold text-gray-800 text-center mb-4">
+                Categories Form
+            </h2>
+            {submittedData ? (
                 <div className="mt-8 p-4 bg-white rounded-lg shadow-lg">
                     <h3 className="text-xl font-bold mb-4">Submitted Data</h3>
                     <table className="table-auto w-full">
@@ -325,11 +241,131 @@ export default function CategoriesForm({ categories }: CategoriesFormProps) {
                                 );
                             })}
                         </tbody>
-
                     </table>
-                </div>
-            )}
 
+                </div>
+            ) : (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                            Categories
+                        </label>
+                        <select
+                            onChange={handleCategoryChange}
+                            className="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm focus:ring focus:ring-indigo-500"
+                        >
+                            <option value="">Select a category</option>
+                            {categories.map((category) => (
+                                <option key={category.id} value={category.id}>
+                                    {category.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    {formData.category && (
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                                Subcategories
+                            </label>
+                            <select
+                                onChange={handleSubcategoryChange}
+                                disabled={!formData.category}
+                                className="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm focus:ring focus:ring-indigo-500"
+                            >
+                                <option value="">
+                                    {formData.category
+                                        ? "Select a subcategory"
+                                        : "No subcategories available"}
+                                </option>
+                                {categories
+                                    .find((cat) => cat.name === formData.category)
+                                    ?.children.map((sub) => (
+                                        <option key={sub.id} value={sub.id}>
+                                            {sub.name}
+                                        </option>
+                                    ))}
+                            </select>
+                        </div>
+                    )}
+
+                    {formData.properties.map((property) => (
+                        <div key={property.id}>
+                            <label className="block text-sm font-medium text-gray-700">
+                                {property.name}
+                            </label>
+                            <Select
+                                options={[
+                                    ...property.options.map((option) => ({
+                                        value: option.id.toString(),
+                                        label: option.name,
+                                    })),
+                                    { value: "other", label: "Other" },
+                                ]}
+                                onChange={(selectedOption) =>
+                                    handleOptionChange(property.id, selectedOption?.value || "")
+                                }
+                                placeholder="Select an option"
+                                className="mt-1"
+                            />
+
+                            {formData.otherInputs[property.id] !== undefined && (
+                                <input
+                                    type="text"
+                                    value={formData.otherInputs[property.id]}
+                                    onChange={(e) =>
+                                        handleOtherInputChange(property.id, e.target.value)
+                                    }
+                                    placeholder="Specify other"
+                                    className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:ring focus:ring-indigo-500"
+                                />
+                            )}
+
+                            {formData.childOptions[property.id] &&
+                                formData.childOptions[property.id].length > 0 && (
+                                    <div className="mt-2">
+                                        <label className="block text-sm font-medium text-gray-700">
+                                            Child Options
+                                        </label>
+                                        <Select
+                                            options={formData.childOptions[property.id].map((child) => ({
+                                                value: child.id.toString(),
+                                                label: child.name,
+                                            }))}
+                                            onChange={(selectedChild) =>
+                                                handleChildOptionChange(
+                                                    property.id,
+                                                    selectedChild?.value || ""
+                                                )
+                                            }
+                                            placeholder="Select a child option"
+                                            value={
+                                                formData.selectedChildOptions[property.id]
+                                                    ? {
+                                                        value: formData.selectedChildOptions[property.id],
+                                                        label: formData.childOptions[property.id].find(
+                                                            (child) =>
+                                                                child.id.toString() ===
+                                                                formData.selectedChildOptions[property.id]
+                                                        )?.name,
+                                                    }
+                                                    : null
+                                            }
+                                            className="mt-1"
+                                        />
+                                    </div>
+                                )}
+                        </div>
+                    ))}
+
+                    <button
+                        type="submit"
+                        className="w-full py-2 px-4 bg-indigo-600 text-white font-bold rounded-lg shadow-md hover:bg-indigo-700 focus:ring focus:ring-indigo-500"
+                    >
+                        Submit
+                    </button>
+                </form>
+            )}
         </div>
     );
+
 }

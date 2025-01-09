@@ -24,7 +24,7 @@ export default async function Page() {
 
     return (
         <main className="min-h-screen bg-gray-100 p-6">
-            <h1 className="text-center text-2xl font-bold mb-6">Category Selector</h1>
+            {/* <h1 className="text-center text-2xl font-bold mb-6">Category Selector</h1> */}
             <CategoriesForm categories={categories} />
         </main>
     );
