@@ -1,13 +1,15 @@
 import React, { memo } from "react";
+import { FormData, SubcategoryOption } from "@/types/CategoriesFormTypes";
+
 
 const SubcategorySelect = ({
     formData,
     subcategoryOptions,
     handleSubcategoryChange,
 }: {
-    formData: any;
-    subcategoryOptions: any;
-    handleSubcategoryChange: any;
+    formData: FormData;
+    subcategoryOptions: SubcategoryOption[];
+    handleSubcategoryChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
 }) => {
     return (
         <div>
@@ -18,7 +20,7 @@ const SubcategorySelect = ({
                 className="mt-1 block w-full rounded border border-gray-300 shadow-sm p-2 focus:border-blue-800 focus:outline-none"
             >
                 <option value="">Select a subcategory</option>
-                {subcategoryOptions.map((option: any) => (
+                {subcategoryOptions.map((option) => (
                     <option key={option.value} value={option.value}>
                         {option.label}
                     </option>
@@ -28,7 +30,18 @@ const SubcategorySelect = ({
     );
 };
 
-const areEqual = (prevProps: any, nextProps: any) => {
+const areEqual = (
+    prevProps: {
+        formData: FormData;
+        subcategoryOptions: SubcategoryOption[];
+        handleSubcategoryChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+    },
+    nextProps: {
+        formData: FormData;
+        subcategoryOptions: SubcategoryOption[];
+        handleSubcategoryChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+    }
+) => {
     return (
         prevProps.subcategoryOptions === nextProps.subcategoryOptions &&
         prevProps.formData === nextProps.formData &&

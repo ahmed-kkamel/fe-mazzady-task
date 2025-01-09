@@ -34,6 +34,15 @@ export interface Category {
 export interface CategoriesFormProps {
   categories: Category[];
 }
+export interface CategoryOption {
+  value: string;
+  label: string;
+}
+
+export interface SubcategoryOption {
+  value: string;
+  label: string;
+}
 
 export interface FormData {
   categoryId?: number;

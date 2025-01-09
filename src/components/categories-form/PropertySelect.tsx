@@ -80,7 +80,18 @@ const PropertySelect = ({
     );
 };
 
-const areEqual = (prevProps: any, nextProps: any) => {
+const areEqual = (
+    prevProps: {
+        formData: FormData;
+        handleOptionChange: (propertyId: number, value: string) => void;
+        setFormData: React.Dispatch<React.SetStateAction<FormData>>;
+    },
+    nextProps: {
+        formData: FormData;
+        handleOptionChange: (propertyId: number, value: string) => void;
+        setFormData: React.Dispatch<React.SetStateAction<FormData>>;
+    }
+) => {
     return (
         prevProps.formData === nextProps.formData &&
         prevProps.handleOptionChange === nextProps.handleOptionChange &&

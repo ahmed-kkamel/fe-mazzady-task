@@ -1,17 +1,15 @@
 import { useState, useMemo, useCallback } from "react";
 import { fetchProperties, fetchChildOptions } from "@/utils/api/api";
-import { FormData } from "@/types/CategoriesFormTypes";
+import { FormData, Category, Subcategory } from "@/types/CategoriesFormTypes";
 
-export const useCategoriesForm = (categories: any[]) => {
+export const useCategoriesForm = (categories: Category[]) => {
   const [formData, setFormData] = useState<FormData>({
     properties: [],
     otherInputs: {},
     childOptions: {},
     selectedChildOptions: {},
   });
-  const [submittedData, setSubmittedData] = useState<typeof formData | null>(
-    null
-  );
+  const [submittedData, setSubmittedData] = useState<FormData | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleCategoryChange = useCallback(
@@ -117,7 +115,7 @@ export const useCategoriesForm = (categories: any[]) => {
   const subcategoryOptions = useMemo(() => {
     const category = categories.find((cat) => cat.id === formData.categoryId);
     return category
-      ? category.children.map((sub: any) => ({
+      ? category.children.map((sub: Subcategory) => ({
           value: sub.id.toString(),
           label: sub.name,
         }))

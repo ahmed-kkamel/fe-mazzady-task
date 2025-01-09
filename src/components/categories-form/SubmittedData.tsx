@@ -1,5 +1,12 @@
+import { FormData, Category, Property, Option } from "@/types/CategoriesFormTypes";
 
-const SubmittedData = ({ submittedData, categories }: { submittedData: any; categories: any[] }) => (
+const SubmittedData = ({
+    submittedData,
+    categories,
+}: {
+    submittedData: FormData;
+    categories: Category[];
+}) => (
     <div className="mt-8 p-4 bg-white rounded-lg shadow-lg">
         <h3 className="text-xl font-bold mb-4">Submitted Data</h3>
         <table className="table-auto w-full border-collapse border border-gray-300">
@@ -24,11 +31,11 @@ const SubmittedData = ({ submittedData, categories }: { submittedData: any; cate
                         <td className="px-4 py-2 border">
                             {categories
                                 .find((cat) => cat.id === submittedData.categoryId)
-                                ?.children.find((sub: any) => sub.id === submittedData.subcategoryId)?.name || "Unknown"}
+                                ?.children.find((sub) => sub.id === submittedData.subcategoryId)?.name || "Unknown"}
                         </td>
                     </tr>
                 )}
-                {submittedData.properties.map((property: any) => {
+                {submittedData.properties.map((property: Property) => {
                     const selectedOption = property.selectedOption;
                     const otherValue = submittedData.otherInputs[property.id];
 
@@ -47,7 +54,7 @@ const SubmittedData = ({ submittedData, categories }: { submittedData: any; cate
                 })}
                 {Object.entries(submittedData.selectedChildOptions).map(([propertyId, childOptionId]) => {
                     const childOption = submittedData.childOptions[parseInt(propertyId)]?.find(
-                        (option: any) => option.id.toString() === childOptionId
+                        (option: Option) => option.id.toString() === childOptionId
                     );
                     return (
                         <tr key={propertyId}>
