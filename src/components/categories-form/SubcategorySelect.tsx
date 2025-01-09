@@ -1,8 +1,14 @@
+import React, { memo } from "react";
 
-const SubcategorySelect = ({ formData, subcategoryOptions, handleSubcategoryChange }:
-    { formData: any, subcategoryOptions: any, handleSubcategoryChange: any }
-) => {
-
+const SubcategorySelect = ({
+    formData,
+    subcategoryOptions,
+    handleSubcategoryChange,
+}: {
+    formData: any;
+    subcategoryOptions: any;
+    handleSubcategoryChange: any;
+}) => {
     return (
         <div>
             <label className="block text-sm font-medium text-gray-700">Subcategories</label>
@@ -22,4 +28,12 @@ const SubcategorySelect = ({ formData, subcategoryOptions, handleSubcategoryChan
     );
 };
 
-export default SubcategorySelect;
+const areEqual = (prevProps: any, nextProps: any) => {
+    return (
+        prevProps.subcategoryOptions === nextProps.subcategoryOptions &&
+        prevProps.formData === nextProps.formData &&
+        prevProps.handleSubcategoryChange === nextProps.handleSubcategoryChange
+    );
+};
+
+export default memo(SubcategorySelect, areEqual);

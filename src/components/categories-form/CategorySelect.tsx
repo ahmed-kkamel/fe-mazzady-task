@@ -1,7 +1,14 @@
+import React, { memo } from "react";
 
-const CategorySelect = ({ categoryOptions, handleCategoryChange, formData }:
-    { categoryOptions: any[], handleCategoryChange: any, formData: any }) => {
-
+const CategorySelect = ({
+    categoryOptions,
+    handleCategoryChange,
+    formData,
+}: {
+    categoryOptions: any[];
+    handleCategoryChange: any;
+    formData: any;
+}) => {
     return (
         <div>
             <label className="block text-sm font-medium text-gray-700">Categories</label>
@@ -21,4 +28,12 @@ const CategorySelect = ({ categoryOptions, handleCategoryChange, formData }:
     );
 };
 
-export default CategorySelect;
+const areEqual = (prevProps: any, nextProps: any) => {
+    return (
+        prevProps.categoryOptions === nextProps.categoryOptions &&
+        prevProps.handleCategoryChange === nextProps.handleCategoryChange &&
+        prevProps.formData === nextProps.formData
+    );
+};
+
+export default memo(CategorySelect, areEqual);

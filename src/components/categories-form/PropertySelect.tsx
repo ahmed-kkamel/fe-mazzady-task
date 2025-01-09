@@ -1,3 +1,4 @@
+import React, { memo } from "react";
 import Select from "react-select";
 import { Property, FormData } from "@/types/CategoriesFormTypes";
 
@@ -10,8 +11,6 @@ const PropertySelect = ({
     handleOptionChange: (propertyId: number, value: string) => void;
     setFormData: React.Dispatch<React.SetStateAction<FormData>>;
 }) => {
-    console.log(formData.properties, "Ahmed");
-
     return (
         <>
             {formData.properties.map((property: Property) => (
@@ -81,4 +80,12 @@ const PropertySelect = ({
     );
 };
 
-export default PropertySelect;
+const areEqual = (prevProps: any, nextProps: any) => {
+    return (
+        prevProps.formData === nextProps.formData &&
+        prevProps.handleOptionChange === nextProps.handleOptionChange &&
+        prevProps.setFormData === nextProps.setFormData
+    );
+};
+
+export default memo(PropertySelect, areEqual);

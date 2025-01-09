@@ -1,7 +1,11 @@
 const BASE_URL = "https://staging.mazaady.com/api/v1";
 
+// Ideally, the private key should be stored in an environment variable for security reasons.
+// However, it is hardcoded here for simplification in this example.
+const PRIVATE_KEY = "3%o8i}_;3D4bF]G5@22r2)Et1&mLJ4?$@+16";
+
 const headers = {
-  "private-key": "3%o8i}_;3D4bF]G5@22r2)Et1&mLJ4?$@+16",
+  "private-key": PRIVATE_KEY,
 };
 
 export const fetchCategories = async () => {

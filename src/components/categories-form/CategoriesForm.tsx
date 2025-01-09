@@ -5,7 +5,7 @@ import SubcategorySelect from "./SubcategorySelect";
 import PropertySelect from "./PropertySelect";
 import SubmitButton from "./SubmitButton";
 import SubmittedData from "./SubmittedData";
-import Loader from "./Loader"; // Import the Loader component
+import Loader from "./Loader";
 import { useCategoriesForm } from "@/hooks/useCategoriesForm";
 import { Category } from "@/types/CategoriesFormTypes";
 
