@@ -34,3 +34,12 @@ export interface Category {
 export interface CategoriesFormProps {
   categories: Category[];
 }
+
+export interface FormData {
+  categoryId?: number;
+  subcategoryId?: number;
+  properties: Property[];
+  otherInputs: Record<number, string>;
+  childOptions: Record<number, Option[]>;
+  selectedChildOptions: Record<number, string>;
+}
